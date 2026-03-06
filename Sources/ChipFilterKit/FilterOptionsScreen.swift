@@ -61,7 +61,6 @@ public struct FilterOptionsScreen<Item>: View {
         }
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
-        .background(.ultraThinMaterial)
         .navigationTitle(definition.title)
         .navigationBarTitleDisplayMode(.inline)
     }
