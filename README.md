@@ -21,7 +21,7 @@ Add this package dependency in Xcode or `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/your-org/ChipFilterKit.git", from: "1.0.0")
+    .package(url: "https://github.com/royrhayem/ChipFilterKit.git", from: "1.0.0")
 ]
 ```
 
