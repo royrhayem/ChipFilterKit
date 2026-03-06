@@ -21,7 +21,7 @@ Add this package dependency in Xcode or `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/royrhayem/ChipFilterKit.git", from: "1.0.0")
+    .package(url: "https://github.com/your-org/ChipFilterKit.git", from: "1.0.0")
 ]
 ```
 
@@ -103,6 +103,100 @@ Use `ChipFilterBar(store:)` for the default experience. It automatically:
 - `filteredItems`: items after applying active criteria
 - `selectedCriteria`: committed criteria
 - `activeFilterCount`: active filters in current editing mode
+
+
+## MVVM Integration (Store Owned by a ViewModel)
+
+If your app follows MVVM, keep `FilterStore` in your `ObservableObject` (or `@Observable`) view model and bind the view to that model.
+
+```swift
+import SwiftUI
+import Observation
+import ChipFilterKit
+
+struct User: Identifiable {
+    let id = UUID()
+    let name: String
+    let gender: String
+    let country: String
+    let role: String
+}
+
+@MainActor
+@Observable
+final class UsersViewModel {
+    private let allUsers: [User]
+    let filterStore: FilterStore<User>
+
+    init(users: [User]) {
+        self.allUsers = users
+
+        let definitions: [FilterDefinition<User>] = [
+            FilterDefinition(
+                id: "gender",
+                title: "Gender",
+                selectionMode: .multiple,
+                optionsProvider: { items in
+                    Set(items.map(\.gender)).sorted().map { FilterOption(id: $0, label: $0) }
+                },
+                matcher: { item, selected in selected.contains(item.gender) }
+            ),
+            FilterDefinition(
+                id: "country",
+                title: "Country",
+                selectionMode: .single,
+                optionsProvider: { items in
+                    Set(items.map(\.country)).sorted().map { FilterOption(id: $0, label: $0) }
+                },
+                matcher: { item, selected in selected.contains(item.country) }
+            ),
+            FilterDefinition(
+                id: "role",
+                title: "Role",
+                selectionMode: .multiple,
+                optionsProvider: { items in
+                    Set(items.map(\.role)).sorted().map { FilterOption(id: $0, label: $0) }
+                },
+                matcher: { item, selected in selected.contains(item.role) }
+            )
+        ]
+
+        self.filterStore = FilterStore(
+            items: allUsers,
+            definitions: definitions,
+            applyMode: .deferred
+        )
+    }
+
+    var visibleUsers: [User] {
+        filterStore.filteredItems
+    }
+}
+
+struct UsersScreen: View {
+    @State private var viewModel = UsersViewModel(users: mockUsers)
+
+    var body: some View {
+        VStack(spacing: 0) {
+            ChipFilterBar(store: viewModel.filterStore)
+
+            List(viewModel.visibleUsers) { user in
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(user.name).bold()
+                    Text("\(user.role) • \(user.country) • \(user.gender)")
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .listStyle(.plain)
+        }
+    }
+}
+```
+
+Notes:
+- Use `.immediate` when the list should react instantly to each tap.
+- Use `.deferred` when you want staged edits in sheets/screens and apply on confirmation.
+- Read `viewModel.filterStore.selectedCriteria`, `viewModel.filterStore.filteredItems`, and `viewModel.filterStore.activeFilterCount` anywhere in your view model or view.
 
 ## Immediate vs Deferred
 
