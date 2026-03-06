@@ -17,62 +17,53 @@ public struct FiltersScreen<Item>: View {
 
     public var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
-                    ForEach(store.definitions) { definition in
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text(definition.title)
-                                .font(.title3.weight(.semibold))
-                                .foregroundStyle(style.rowTitleColor)
-
-                            if let subtitle = definition.subtitle {
-                                Text(subtitle)
-                                    .font(.body)
-                                    .foregroundStyle(style.rowSubtitleColor)
-                            }
-
-                            NavigationLink {
-                                FilterOptionsScreen(store: store, definition: definition, style: style)
-                            } label: {
-                                HStack {
-                                    Text(store.summary(for: definition))
+            List {
+                ForEach(store.definitions) { definition in
+                    Section {
+                        NavigationLink {
+                            FilterOptionsScreen(store: store, definition: definition, style: style)
+                        } label: {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(definition.title)
+                                        .font(.body.weight(.medium))
                                         .foregroundStyle(style.rowTitleColor)
-                                    Spacer()
-                                    if store.selectedOptionIDs(for: definition.id).isEmpty == false {
-                                        Image(systemName: "checkmark")
-                                            .foregroundStyle(style.chipActiveForeground)
-                                    } else {
-                                        Image(systemName: "chevron.right")
-                                            .foregroundStyle(style.rowSubtitleColor)
-                                    }
+                                    Text(store.summary(for: definition))
+                                        .font(.subheadline)
+                                        .foregroundStyle(style.rowSubtitleColor)
                                 }
-                                .font(.title3.weight(.medium))
-                                .padding(.horizontal, 18)
-                                .padding(.vertical, 16)
-                                .background(style.cardColor)
-                                .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius, style: .continuous))
+                                Spacer()
+                                if !store.selectedOptionIDs(for: definition.id).isEmpty {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundStyle(style.chipActiveForeground)
+                                }
                             }
-                            .buttonStyle(.plain)
+                        }
+                    } header: {
+                        if let subtitle = definition.subtitle {
+                            Text(subtitle)
                         }
                     }
                 }
-                .padding(20)
             }
+            .listStyle(.insetGrouped)
+            .scrollContentBackground(.hidden)
+            .background(.ultraThinMaterial)
+            .navigationTitle("Filters")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .cancellationAction) {
                     Button {
                         if store.applyMode == .deferred {
                             store.discardStagedChanges()
                         }
                         dismiss()
                     } label: {
-                        Image(systemName: "xmark")
+                        Image(systemName: "xmark.circle.fill")
+                            .symbolRenderingMode(.hierarchical)
+                            .foregroundStyle(.secondary)
+                            .font(.title2)
                     }
-                }
-
-                ToolbarItem(placement: .principal) {
-                    Text("Filters")
-                        .font(.title3.weight(.semibold))
                 }
 
                 ToolbarItemGroup(placement: .topBarTrailing) {
@@ -82,7 +73,8 @@ public struct FiltersScreen<Item>: View {
                             store.applyStagedChanges()
                         }
                     } label: {
-                        Image(systemName: "arrow.counterclockwise")
+                        Text("Reset")
+                            .font(.subheadline)
                     }
 
                     if store.applyMode == .deferred {
@@ -90,13 +82,13 @@ public struct FiltersScreen<Item>: View {
                             store.applyStagedChanges()
                             dismiss()
                         } label: {
-                            Image(systemName: "checkmark")
+                            Text("Apply")
+                                .font(.subheadline.weight(.semibold))
                         }
                     }
                 }
             }
         }
-        .filterScreenBackground(style)
     }
 }
 

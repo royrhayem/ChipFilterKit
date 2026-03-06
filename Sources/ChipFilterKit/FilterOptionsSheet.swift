@@ -21,52 +21,71 @@ public struct FilterOptionsSheet<Item>: View {
     }
 
     public var body: some View {
-        VStack(spacing: 16) {
-            Capsule()
-                .fill(Color.secondary.opacity(0.35))
-                .frame(width: 48, height: 6)
-                .padding(.top, 8)
-
-            CenteredHeaderBar(title: definition.title) {
-                Button(action: onClose) {
-                    Image(systemName: "xmark")
-                        .font(.title3)
-                        .frame(width: 42, height: 42)
-                        .background(style.chipInactiveBackground)
-                        .clipShape(Circle())
+        NavigationStack {
+            List {
+                Section {
+                    ForEach(store.options(for: definition)) { option in
+                        Button {
+                            store.setSelection(
+                                filterID: definition.id,
+                                optionID: option.id,
+                                mode: definition.selectionMode
+                            )
+                        } label: {
+                            HStack(spacing: 10) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(option.label)
+                                        .foregroundStyle(style.rowTitleColor)
+                                        .font(.body)
+                                    if let secondary = option.secondaryLabel {
+                                        Text(secondary)
+                                            .foregroundStyle(style.rowSubtitleColor)
+                                            .font(.footnote)
+                                    }
+                                }
+                                Spacer()
+                                if store.isOptionSelected(filterID: definition.id, optionID: option.id) {
+                                    Image(systemName: "checkmark")
+                                        .font(.headline)
+                                        .foregroundStyle(style.chipActiveForeground)
+                                }
+                            }
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
-                .buttonStyle(.plain)
-            } trailing: {
-                Button {
-                    store.reset(filterID: definition.id)
-                } label: {
-                    Image(systemName: "arrow.counterclockwise")
-                        .font(.title3)
-                        .frame(width: 42, height: 42)
-                        .background(style.chipInactiveBackground)
-                        .clipShape(Circle())
-                }
-                .buttonStyle(.plain)
             }
-            .padding(.horizontal, 20)
-
-            RoundedOptionsCard(
-                options: store.options(for: definition),
-                isSelected: { option in
-                    store.isOptionSelected(filterID: definition.id, optionID: option.id)
-                },
-                onSelect: { option in
-                    store.setSelection(filterID: definition.id, optionID: option.id, mode: definition.selectionMode)
-                },
-                style: style
-            )
-            .padding(.horizontal, 20)
-
-            Spacer(minLength: 0)
+            .listStyle(.insetGrouped)
+            .scrollContentBackground(.hidden)
+            .background(.ultraThinMaterial)
+            .navigationTitle(definition.title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button {
+                        onClose()
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .symbolRenderingMode(.hierarchical)
+                            .foregroundStyle(.secondary)
+                            .font(.title2)
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        store.reset(filterID: definition.id)
+                    } label: {
+                        Text("Reset")
+                            .font(.subheadline)
+                    }
+                }
+            }
         }
-        .padding(.bottom, 20)
-        .filterScreenBackground(style)
-        .presentationDetents([.fraction(0.46), .large])
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
+        .presentationCornerRadius(20)
+        .presentationBackground(.ultraThinMaterial)
     }
 }
 
