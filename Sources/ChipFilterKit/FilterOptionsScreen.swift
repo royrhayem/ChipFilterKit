@@ -24,8 +24,7 @@ public struct FilterOptionsScreen<Item>: View {
                     Button {
                         store.setSelection(
                             filterID: definition.id,
-                            optionID: option.id,
-                            mode: definition.selectionMode
+                            optionID: option.id
                         )
                     } label: {
                         HStack(spacing: 10) {

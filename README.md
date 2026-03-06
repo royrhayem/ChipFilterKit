@@ -21,7 +21,7 @@ Add this package dependency in Xcode or `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/your-org/ChipFilterKit.git", from: "1.0.0")
+    .package(url: "https://github.com/royrhayem/ChipFilterKit.git", from: "1.0.0")
 ]
 ```
 
@@ -89,6 +89,38 @@ Each `FilterDefinition<Item>` includes:
 - `matcher` to evaluate if an item matches selected options
 - optional `summaryFormatter`
 - optional `optionsSorter`
+
+## Conditional Filter Visibility
+
+A filter can be made dependent on another filter's selection by providing a `visibilityCondition` closure. The filter is only shown — and only applied — when the condition returns `true`.
+
+When a filter becomes hidden, any selection it held is automatically cleared so it never silently affects results.
+
+```swift
+FilterDefinition(
+    id: "subCategory",
+    title: "Sub-category",
+    selectionMode: .single,
+    optionsProvider: { items in
+        Set(items.map(\.subCategory)).sorted().map { FilterOption(id: $0, label: $0) }
+    },
+    matcher: { item, selected in selected.contains(item.subCategory) },
+    visibilityCondition: { criteria in
+        // Only show "Sub-category" once a category has been selected
+        !criteria["category"].isEmpty
+    }
+)
+```
+
+`visibilityCondition` receives the current `FilterCriteria`, so you can inspect any filter's selection:
+
+```swift
+visibilityCondition: { criteria in
+    criteria["category"].optionIDs.contains("Electronics")
+}
+```
+
+Both `ChipFilterBar` and `FiltersScreen` respect `visibilityCondition` automatically — no extra work needed in the view layer.
 
 ## Rendering the Chip Bar
 

@@ -6,6 +6,9 @@ public struct FilterDefinition<Item>: Identifiable {
     public typealias Matcher = @Sendable (_ item: Item, _ selectedOptionIDs: Set<String>) -> Bool
     public typealias SummaryFormatter = @Sendable (_ title: String, _ selectedOptions: [FilterOption]) -> String
     public typealias OptionsSorter = @Sendable (_ lhs: FilterOption, _ rhs: FilterOption) -> Bool
+    /// Returns whether this filter should be visible given the current criteria.
+    /// When `nil`, the filter is always visible.
+    public typealias VisibilityCondition = @Sendable (_ criteria: FilterCriteria) -> Bool
 
     public let id: String
     public let title: String
@@ -15,6 +18,7 @@ public struct FilterDefinition<Item>: Identifiable {
     public let matcher: Matcher
     public let summaryFormatter: SummaryFormatter?
     public let optionsSorter: OptionsSorter?
+    public let visibilityCondition: VisibilityCondition?
 
     public init(
         id: String,
@@ -24,7 +28,8 @@ public struct FilterDefinition<Item>: Identifiable {
         optionsProvider: @escaping OptionsProvider,
         matcher: @escaping Matcher,
         summaryFormatter: SummaryFormatter? = nil,
-        optionsSorter: OptionsSorter? = nil
+        optionsSorter: OptionsSorter? = nil,
+        visibilityCondition: VisibilityCondition? = nil
     ) {
         self.id = id
         self.title = title
@@ -34,6 +39,7 @@ public struct FilterDefinition<Item>: Identifiable {
         self.matcher = matcher
         self.summaryFormatter = summaryFormatter
         self.optionsSorter = optionsSorter
+        self.visibilityCondition = visibilityCondition
     }
 
     public func options(from items: [Item]) -> [FilterOption] {

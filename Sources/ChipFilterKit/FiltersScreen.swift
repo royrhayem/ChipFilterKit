@@ -18,7 +18,7 @@ public struct FiltersScreen<Item>: View {
     public var body: some View {
         NavigationStack {
             List {
-                ForEach(store.definitions) { definition in
+                ForEach(store.visibleDefinitions) { definition in
                     Section {
                         NavigationLink {
                             FilterOptionsScreen(store: store, definition: definition, style: style)

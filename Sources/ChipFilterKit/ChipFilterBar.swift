@@ -29,7 +29,7 @@ public struct ChipFilterBar<Item>: View {
                     showsFullFilters = true
                 }
 
-                ForEach(store.definitions) { definition in
+                ForEach(store.visibleDefinitions) { definition in
                     FilterChip(
                         title: store.summary(for: definition),
                         isActive: !store.selectedOptionIDs(for: definition.id).isEmpty,
