@@ -18,32 +18,52 @@ public struct FilterOptionsScreen<Item>: View {
     }
 
     public var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                RoundedOptionsCard(
-                    options: store.options(for: definition),
-                    isSelected: { option in
-                        store.isOptionSelected(filterID: definition.id, optionID: option.id)
-                    },
-                    onSelect: { option in
-                        store.setSelection(filterID: definition.id, optionID: option.id, mode: definition.selectionMode)
-                    },
-                    style: style
-                )
-
+        List {
+            Section {
+                ForEach(store.options(for: definition)) { option in
+                    Button {
+                        store.setSelection(
+                            filterID: definition.id,
+                            optionID: option.id,
+                            mode: definition.selectionMode
+                        )
+                    } label: {
+                        HStack(spacing: 10) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(option.label)
+                                    .foregroundStyle(style.rowTitleColor)
+                                    .font(.body)
+                                if let secondary = option.secondaryLabel {
+                                    Text(secondary)
+                                        .foregroundStyle(style.rowSubtitleColor)
+                                        .font(.footnote)
+                                }
+                            }
+                            Spacer()
+                            if store.isOptionSelected(filterID: definition.id, optionID: option.id) {
+                                Image(systemName: "checkmark")
+                                    .font(.headline)
+                                    .foregroundStyle(style.chipActiveForeground)
+                            }
+                        }
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                }
+            } footer: {
                 Button("Reset \(definition.title)") {
                     store.reset(filterID: definition.id)
                 }
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(style.chipActiveForeground)
-                .padding(.horizontal, 4)
+                .padding(.top, 8)
             }
-            .padding(.horizontal, 20)
-            .padding(.top, 14)
         }
+        .listStyle(.insetGrouped)
+        .scrollContentBackground(.hidden)
+        .background(.ultraThinMaterial)
         .navigationTitle(definition.title)
         .navigationBarTitleDisplayMode(.inline)
-        .filterScreenBackground(style)
     }
 }
 
