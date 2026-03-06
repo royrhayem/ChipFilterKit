@@ -58,7 +58,6 @@ public struct FilterOptionsSheet<Item>: View {
             }
             .listStyle(.insetGrouped)
             .scrollContentBackground(.hidden)
-            .background(.ultraThinMaterial)
             .navigationTitle(definition.title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

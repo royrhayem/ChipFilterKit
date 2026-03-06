@@ -48,7 +48,6 @@ public struct FiltersScreen<Item>: View {
             }
             .listStyle(.insetGrouped)
             .scrollContentBackground(.hidden)
-            .background(.ultraThinMaterial)
             .navigationTitle("Filters")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
