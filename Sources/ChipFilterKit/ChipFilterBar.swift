@@ -47,9 +47,10 @@ public struct ChipFilterBar<Item>: View {
                 selectedDefinition = nil
             }
         }
-        .fullScreenCover(isPresented: $showsFullFilters) {
+        .sheet(isPresented: $showsFullFilters, content: {
             FiltersScreen(store: store, style: style)
-        }
+                .presentationDetents([.large])
+        })
     }
 }
 

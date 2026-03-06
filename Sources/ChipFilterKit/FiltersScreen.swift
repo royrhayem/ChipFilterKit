@@ -23,20 +23,13 @@ public struct FiltersScreen<Item>: View {
                         NavigationLink {
                             FilterOptionsScreen(store: store, definition: definition, style: style)
                         } label: {
-                            HStack {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(definition.title)
-                                        .font(.body.weight(.medium))
-                                        .foregroundStyle(style.rowTitleColor)
-                                    Text(store.summary(for: definition))
-                                        .font(.subheadline)
-                                        .foregroundStyle(style.rowSubtitleColor)
-                                }
-                                Spacer()
-                                if !store.selectedOptionIDs(for: definition.id).isEmpty {
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .foregroundStyle(style.chipActiveForeground)
-                                }
+                            LabeledContent {
+                                Text(store.summary(for: definition))
+                                    .foregroundStyle(style.rowSubtitleColor)
+                            } label: {
+                                Text(definition.title)
+                                    .font(.body)
+                                    .foregroundStyle(style.rowTitleColor)
                             }
                         }
                     } header: {
@@ -47,7 +40,6 @@ public struct FiltersScreen<Item>: View {
                 }
             }
             .listStyle(.insetGrouped)
-            .scrollContentBackground(.hidden)
             .navigationTitle("Filters")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -58,10 +50,7 @@ public struct FiltersScreen<Item>: View {
                         }
                         dismiss()
                     } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .symbolRenderingMode(.hierarchical)
-                            .foregroundStyle(.secondary)
-                            .font(.title2)
+                        Image(systemName: "xmark")
                     }
                 }
 
@@ -72,8 +61,7 @@ public struct FiltersScreen<Item>: View {
                             store.applyStagedChanges()
                         }
                     } label: {
-                        Text("Reset")
-                            .font(.subheadline)
+                        Image(systemName: "arrow.counterclockwise")
                     }
 
                     if store.applyMode == .deferred {

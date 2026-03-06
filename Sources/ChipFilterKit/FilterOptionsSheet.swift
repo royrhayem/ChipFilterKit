@@ -57,7 +57,6 @@ public struct FilterOptionsSheet<Item>: View {
                 }
             }
             .listStyle(.insetGrouped)
-            .scrollContentBackground(.hidden)
             .navigationTitle(definition.title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -65,26 +64,19 @@ public struct FilterOptionsSheet<Item>: View {
                     Button {
                         onClose()
                     } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .symbolRenderingMode(.hierarchical)
-                            .foregroundStyle(.secondary)
-                            .font(.title2)
+                        Image(systemName: "xmark")
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         store.reset(filterID: definition.id)
                     } label: {
-                        Text("Reset")
-                            .font(.subheadline)
+                        Image(systemName: "arrow.counterclockwise")
                     }
                 }
             }
         }
         .presentationDetents([.medium, .large])
-        .presentationDragIndicator(.visible)
-        .presentationCornerRadius(20)
-        .presentationBackground(.ultraThinMaterial)
     }
 }
 
